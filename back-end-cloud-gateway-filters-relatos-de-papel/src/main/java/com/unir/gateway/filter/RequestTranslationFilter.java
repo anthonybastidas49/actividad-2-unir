@@ -42,35 +42,37 @@ public class RequestTranslationFilter implements GlobalFilter {
      * @return a Mono<Void> that indicates when request handling is complete
      */
     @Override
-    public Mono<Void> filter(
-            ServerWebExchange exchange,
-            GatewayFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        // By default, set the response status to 400. This will be overridden if the request is valid.
-        exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
-        try {
-            // Simple check to see if the request has a content type and is a POST request
-            if (exchange.getRequest().getHeaders().getContentType() == null ) {
-                log.info("Request does not have a content type or is not a POST request");
-                return exchange.getResponse().setComplete();
-            } else {
-                return DataBufferUtils.join(exchange.getRequest().getBody())
-                        .flatMap(dataBuffer -> {
-                            GatewayRequest request = requestBodyExtractor.getRequest(exchange, dataBuffer);
-                            ServerHttpRequest mutatedRequest = requestDecoratorFactory.getDecorator(request);
-                            //RouteToRequestUrlFilter writes the URI to the exchange attributes *before* any global filters run.
-                            exchange.getAttributes().put(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR, mutatedRequest.getURI());
-                            if(request.getQueryParams() != null) {
-                                request.getQueryParams().clear();
-                            }
-                            log.info("Proxying request: {} {}", mutatedRequest.getMethod(), mutatedRequest.getURI());
-                            return chain.filter(exchange.mutate().request(mutatedRequest).build());
-                        });
-            }
-        } catch (Exception e) {
-            log.error("Error in RequestTranslationFilter: {}", e.getMessage());
-            throw e;
+        HttpMethod method = exchange.getRequest().getMethod();
+
+
+        if (method == null || method == HttpMethod.GET || method == HttpMethod.DELETE) {
+            return chain.filter(exchange);
         }
 
+
+        if (exchange.getRequest().getHeaders().getContentType() == null) {
+
+            return chain.filter(exchange);
+        }
+
+        return DataBufferUtils.join(exchange.getRequest().getBody())
+                .flatMap(dataBuffer -> {
+                    GatewayRequest request = requestBodyExtractor.getRequest(exchange, dataBuffer);
+                    ServerHttpRequest mutatedRequest = requestDecoratorFactory.getDecorator(request);
+
+                    exchange.getAttributes().put(
+                            ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR,
+                            mutatedRequest.getURI()
+                    );
+
+                    if (request.getQueryParams() != null) {
+                        request.getQueryParams().clear();
+                    }
+
+                    log.info("Proxying request: {} {}", mutatedRequest.getMethod(), mutatedRequest.getURI());
+                    return chain.filter(exchange.mutate().request(mutatedRequest).build());
+                });
     }
 }
