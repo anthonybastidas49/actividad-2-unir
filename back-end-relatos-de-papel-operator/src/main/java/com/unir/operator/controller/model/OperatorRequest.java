@@ -2,6 +2,7 @@ package com.unir.operator.controller.model;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,10 +18,10 @@ public class OperatorRequest {
     @NotNull(message = "`books` cannot be null")
     @NotEmpty(message = "`books` cannot be empty")
     private List<BookRequest> books;
-    @NotNull(message = "`books` cannot be null")
-    @NotEmpty(message = "`books` cannot be empty")
+    @NotNull(message = "`client id` cannot be null")
+    @NotEmpty(message = "`client id` cannot be empty")
     private String clientID;
-    @NotNull(message = "`books` cannot be null")
-    @NotEmpty(message = "`books` cannot be empty")
-    private Long totalAmount;
+    @NotNull(message = "`totalAmount` cannot be null")
+    @Positive(message = "`totalAmount` must be greater than 0")
+    private Float totalAmount;
 }

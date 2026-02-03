@@ -20,14 +20,11 @@ public class Order {
     private Long id;
 
     @ElementCollection
-    @Column(name = "books")
     private List<Book> books;
 
-    @ElementCollection
     @Column(name = "clientID")
     private String clientID;
 
-    @ElementCollection
     @Column(name = "totalAmount")
-    private Long totalAmount;
+    private Float totalAmount;
 }
