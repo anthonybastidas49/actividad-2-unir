@@ -19,6 +19,18 @@ spring:
       settings:
         web-allow-others: true
 
+## Swagger
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  info:
+    title: Microservicio operador relatos de papel.
+    version: 1.0.0
+    description: El microservicio de gestion de pagos del sistema relatos de papel. Encargado de gestionar los pagos de los libros adquiridos por los usuarios.
+    contact:
+      name: Grupo 5 equipo de desarrollo.
 
 ## Configuracion del cliente de Eureka
 eureka:
@@ -29,8 +41,8 @@ eureka:
     preferIpAddress: true
     hostname: ms-books-payments
 
-## Configuracion secundaria (custom) TODO change for url of books service
+## Configuracion secundaria (custom)
 getBook:
-  url: http://ms-books-catalogue/book/%s
+  url: http://ms-books-catalogue/books/%s
 
 

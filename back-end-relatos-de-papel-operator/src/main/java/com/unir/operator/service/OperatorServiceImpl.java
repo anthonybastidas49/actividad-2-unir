@@ -25,19 +25,21 @@ public class OperatorServiceImpl implements OperatorService {
                     if (bookFromFacade != null) {
                         return com.unir.operator.data.model.Book.builder()
                                 .id(bookFromFacade.getId())
-                                .unit(bookRequest.getUnits())
+                                .unit(bookRequest.getQuantity())
                                 .build();
                     }
                     return null;
                 })
                 .filter(java.util.Objects::nonNull)
                 .collect(Collectors.toList());
+
         Order order = Order.builder()
                 .books(books)
+                .clientID(request.getClientID())
+                .totalAmount(request.getTotalAmount())
                 .build();
 
-        repository.save(order);
-        return order;
+        return repository.save(order);
     }
     @Override
     public Order getOrder(String id) {
